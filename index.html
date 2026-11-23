@@ -25,17 +25,17 @@
         
         /* UI Menu Subway Surfers Style */
         .menu-card { 
-            pointer-events: auto; background: rgba(15, 15, 25, 0.88); border: 4px solid #ff0055; 
+            pointer-events: auto; background: rgba(15, 15, 25, 0.92); border: 4px solid #ff0055; 
             padding: 20px 30px; border-radius: 24px; text-align: center; color: white; width: 85%; max-width: 460px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(255, 0, 85, 0.4); backdrop-filter: blur(8px);
         }
 
         .logo-title { 
-            font-family: 'Permanent Marker', cursive; font-size: 42px; color: #ffcc00; 
+            font-family: 'Permanent Marker', cursive; font-size: 40px; color: #ffcc00; 
             text-shadow: 4px 4px 0px #ff0055, 7px 7px 0px #000; margin: 0 0 10px 0; transform: rotate(-2deg); letter-spacing: 2px;
         }
 
-        .sub-title { font-size: 14px; color: #00ffff; text-shadow: 2px 2px 0 #000; margin-bottom: 15px; letter-spacing: 1px; }
+        .sub-title { font-size: 13px; color: #00ffff; text-shadow: 2px 2px 0 #000; margin-bottom: 15px; letter-spacing: 1px; }
 
         .input-name { 
             width: 100%; padding: 12px; border-radius: 12px; border: 3px solid #ffcc00; 
@@ -249,7 +249,7 @@
         if (!gameInstance) {
             gameInstance = new Phaser.Game(config);
         } else {
-            gameInstance.scene.getScene('MainScene').scene.restart();
+            gameInstance.scene.start('MainScene');
         }
     }
 
@@ -305,136 +305,195 @@
         }
     }
 
-    // Phaser 3 Engine dengan Auto Procedural Graphics Fallback (Anti Layar Hitam)
+    // SCENE 1: Preloader untuk Memuat Seluruh 43 Aset Gambar dari JSON Manifest
+    class PreloaderScene extends Phaser.Scene {
+        constructor() { super('PreloaderScene'); }
+
+        preload() {
+            // Tampilan Loading Bar
+            let progressBar = this.add.graphics();
+            let progressBox = this.add.graphics();
+            progressBox.fillStyle(0x1e293b, 0.8);
+            progressBox.fillRect(280, 250, 400, 40);
+
+            let loadingText = this.add.text(480, 220, 'Memuat Aset Game Edukasi...', { font: '18px Titan One', fill: '#00ffff' }).setOrigin(0.5);
+
+            this.load.on('progress', (value) => {
+                progressBar.clear();
+                progressBar.fillStyle(0xff0055, 1);
+                progressBar.fillRect(290, 260, 380 * value, 20);
+            });
+
+            this.load.on('complete', () => {
+                progressBar.destroy();
+                progressBox.destroy();
+                loadingText.destroy();
+            });
+
+            // 1. Load Manifest JSON
+            this.load.json('assets_manifest', 'assets.json');
+        }
+
+        create() {
+            const manifest = this.cache.json.get('assets_manifest');
+            
+            // 2. Queue dan Muat Seluruh 43 Berkas Gambar
+            if (manifest && manifest.assets) {
+                manifest.assets.forEach(asset => {
+                    // Penyesuaian Path Folder assets/
+                    this.load.image(asset.name, 'assets/' + asset.file);
+                });
+            }
+
+            // Jalankan loader kedua khusus untuk mendownload gambar aset
+            this.load.once('complete', () => {
+                this.scene.start('MainScene');
+            });
+            
+            this.load.start();
+        }
+    }
+
+    // SCENE 2: Main Gameplay
+    class MainScene extends Phaser.Scene {
+        constructor() { super('MainScene'); }
+
+        create() {
+            isGameOver = false; 
+            currentScore = 0;
+            currentLaneIndex = 1;
+
+            // 1. Buat Animasi Koin Berputar (coin_1 s.d. coin_4)
+            if (this.textures.exists('coin_1')) {
+                this.anims.create({
+                    key: 'coin_spin',
+                    frames: [{ key: 'coin_1' }, { key: 'coin_2' }, { key: 'coin_3' }, { key: 'coin_4' }],
+                    frameRate: 8, repeat: -1
+                });
+            }
+
+            // 2. Latar Belakang Bangunan Kota
+            this.add.rectangle(0, 0, 960, 540, 0x0f172a).setOrigin(0);
+            if (this.textures.exists('building_blue')) this.add.image(150, 180, 'building_blue').setScale(1.2);
+            if (this.textures.exists('clock_tower')) this.add.image(480, 160, 'clock_tower').setScale(1.2);
+            if (this.textures.exists('building_yellow')) this.add.image(810, 180, 'building_yellow').setScale(1.2);
+
+            // 3. Lintasan Rel 3-Jalur (TileSprite)
+            if (this.textures.exists('rail_tile')) {
+                roadTile = this.add.tileSprite(480, 380, 500, 540, 'rail_tile').setDepth(2);
+            } else {
+                roadTile = this.add.tileSprite(480, 380, 500, 540, 'rail_tile');
+            }
+
+            // 4. Karakter Pemain (Sprite Penuh Aset char_back)
+            const playerTexture = this.textures.exists('char_back') ? 'char_back' : 'char_run_1';
+            player = this.physics.add.sprite(lanes[currentLaneIndex], 430, playerTexture).setDepth(5);
+            player.setScale(0.65);
+            player.setCollideWorldBounds(true);
+            player.body.setSize(50, 90);
+
+            obstacles = this.physics.add.group();
+            coins = this.physics.add.group();
+
+            // 5. Tampilan Skor UI
+            if (this.textures.exists('ui_coin_icon')) {
+                this.add.image(35, 30, 'ui_coin_icon').setDepth(10).setScale(0.8);
+            }
+            scoreText = this.add.text(65, 18, `${playerName} | Map: ${selectedSubject} | Skor: 0`, {
+                fontSize: '18px', fill: '#ffcc00', fontStyle: 'bold',
+                backgroundColor: '#0f172aaa', padding: { x: 12, y: 6 }
+            }).setDepth(10);
+
+            // Input Keyboard
+            this.input.keyboard.on('keydown-LEFT', () => this.moveLane(-1));
+            this.input.keyboard.on('keydown-RIGHT', () => this.moveLane(1));
+            this.input.keyboard.on('keydown-UP', () => this.jumpPlayer());
+
+            // Spawner Rintangan & Koin
+            this.time.addEvent({ delay: 1700, callback: this.spawnObstacle, callbackScope: this, loop: true });
+            this.time.addEvent({ delay: 850, callback: this.spawnCoin, callbackScope: this, loop: true });
+
+            this.physics.add.overlap(player, coins, this.collectCoin, null, this);
+            this.physics.add.collider(player, obstacles, this.hitObstacle, null, this);
+        }
+
+        moveLane(dir) {
+            if (isGameOver || isJumping) return;
+            currentLaneIndex = Phaser.Math.Clamp(currentLaneIndex + dir, 0, 2);
+            player.x = lanes[currentLaneIndex];
+        }
+
+        jumpPlayer() {
+            if (!isJumping && player.body.touching.down) {
+                isJumping = true;
+                player.setVelocityY(-850);
+                this.time.delayedCall(750, () => { isJumping = false; });
+            }
+        }
+
+        spawnObstacle() {
+            if (isGameOver || !player) return;
+            const lane = Phaser.Math.Between(0, 2);
+            const obstacleTypes = ['train_red', 'train_yellow', 'barrier', 'crate', 'barrel'];
+            const chosenType = obstacleTypes[Phaser.Math.Between(0, obstacleTypes.length - 1)];
+
+            const obsKey = this.textures.exists(chosenType) ? chosenType : 'train_red';
+            const obs = obstacles.create(lanes[lane], -60, obsKey).setDepth(4);
+            obs.setVelocityY(scrollSpeed * 60);
+            obs.body.immovable = true;
+            obs.setScale(0.7);
+        }
+
+        spawnCoin() {
+            if (isGameOver || !player) return;
+            const lane = Phaser.Math.Between(0, 2);
+            const coinKey = this.textures.exists('coin_1') ? 'coin_1' : 'coin_1';
+            const coin = coins.create(lanes[lane], -40, coinKey).setDepth(4);
+            
+            if (this.anims.exists('coin_spin')) coin.play('coin_spin');
+            
+            coin.setVelocityY(scrollSpeed * 60);
+            coin.setScale(0.6);
+        }
+
+        collectCoin(p, coin) {
+            coin.destroy();
+            currentScore += 10;
+            scoreText.setText(`${playerName} | Map: ${selectedSubject} | Skor: ${currentScore}`);
+        }
+
+        hitObstacle(p, obs) {
+            if (isGameOver) return;
+            isGameOver = true;
+            this.physics.pause();
+            obs.destroy();
+            triggerQuiz();
+        }
+
+        update() {
+            if (!isGameOver && roadTile) {
+                roadTile.tilePositionY -= scrollSpeed;
+            }
+        }
+
+        resumeAfterQuiz() {
+            isGameOver = false;
+            scoreText.setText(`${playerName} | Map: ${selectedSubject} | Skor: ${currentScore}`);
+            this.physics.resume();
+        }
+    }
+
+    const lanes = [280, 480, 680];
+    let currentLaneIndex = 1, player, obstacles, coins, scoreText, roadTile;
+    let isJumping = false, isGameOver = false, scrollSpeed = 6;
+
     const config = {
         type: Phaser.AUTO,
         parent: 'game-container',
         width: 960,
         height: 540,
         physics: { default: 'arcade', arcade: { gravity: { y: 1600 }, debug: false } },
-        scene: { key: 'MainScene', preload: preload, create: create, update: update }
-    };
-
-    let player, lanes = [280, 480, 680], currentLaneIndex = 1;
-    let obstacles, coins, scoreText, roadTile;
-    let isJumping = false, isGameOver = false, scrollSpeed = 6;
-
-    function preload() {
-        // Pembuatan Grafik Vektor Bawaan (Anti Hitam bila Aset PNG Belum Terbaca)
-        let g = this.make.graphics({ x: 0, y: 0, add: false });
-        
-        // Player (Baju Grafiti Merah-Kuning)
-        g.fillStyle(0xff0055, 1); g.fillRect(10, 0, 30, 40);
-        g.fillStyle(0x00ffff, 1); g.fillRect(10, 40, 30, 30);
-        g.fillStyle(0xffcc00, 1); g.fillCircle(25, -5, 12);
-        g.generateTexture('char_back', 50, 80);
-
-        // Kereta / Rintangan
-        g.clear(); g.fillStyle(0xd97706, 1); g.fillRect(0, 0, 70, 50);
-        g.fillStyle(0xff0055, 1); g.fillRect(5, 10, 60, 15);
-        g.generateTexture('train_red', 70, 50);
-
-        // Koin Emas
-        g.clear(); g.fillStyle(0xfacc15, 1); g.fillCircle(15, 15, 15);
-        g.generateTexture('coin_1', 30, 30);
-
-        // Rel Jalan
-        g.clear(); g.fillStyle(0x1e293b, 1); g.fillRect(0, 0, 400, 100);
-        g.fillStyle(0x475569, 1); g.fillRect(40, 0, 10, 100); g.fillRect(350, 0, 10, 100);
-        g.generateTexture('rail_tile', 400, 100);
-
-        // Mencoba membaca aset eksternal secara aman jika ada
-        this.load.json('assets_manifest', 'assets.json');
-    }
-
-    function create() {
-        isGameOver = false; currentScore = 0;
-        
-        // Background Kota
-        this.add.rectangle(0, 0, 960, 540, 0x0f172a).setOrigin(0);
-        this.add.rectangle(480, 120, 960, 120, 0x1e293b).setOrigin(0.5);
-
-        // Rel 3-Jalur
-        roadTile = this.add.tileSprite(480, 380, 500, 540, 'rail_tile');
-
-        // Character Player
-        player = this.physics.add.sprite(lanes[currentLaneIndex], 430, 'char_back').setDepth(5);
-        player.setCollideWorldBounds(true);
-        player.body.setSize(40, 70);
-
-        obstacles = this.physics.add.group();
-        coins = this.physics.add.group();
-
-        scoreText = this.add.text(20, 20, `${playerName} | Map: ${selectedSubject} | Skor: 0`, {
-            fontSize: '18px', fill: '#ffcc00', fontStyle: 'bold',
-            backgroundColor: '#0f172aaa', padding: { x: 12, y: 6 }
-        }).setDepth(10);
-
-        // Input Keyboard
-        this.input.keyboard.on('keydown-LEFT', () => moveLane(-1));
-        this.input.keyboard.on('keydown-RIGHT', () => moveLane(1));
-        this.input.keyboard.on('keydown-UP', () => jumpPlayer());
-
-        this.time.addEvent({ delay: 1700, callback: spawnObstacle, callbackScope: this, loop: true });
-        this.time.addEvent({ delay: 850, callback: spawnCoin, callbackScope: this, loop: true });
-
-        this.physics.add.overlap(player, coins, collectCoin, null, this);
-        this.physics.add.collider(player, obstacles, hitObstacle, null, this);
-    }
-
-    function moveLane(dir) {
-        if (isGameOver || isJumping) return;
-        currentLaneIndex = Phaser.Math.Clamp(currentLaneIndex + dir, 0, 2);
-        player.x = lanes[currentLaneIndex];
-    }
-
-    function jumpPlayer() {
-        if (!isJumping && player.body.touching.down) {
-            isJumping = true;
-            player.setVelocityY(-850);
-            this.time.delayedCall(750, () => { isJumping = false; });
-        }
-    }
-
-    function spawnObstacle() {
-        if (isGameOver || !player) return;
-        const lane = Phaser.Math.Between(0, 2);
-        const obs = obstacles.create(lanes[lane], -50, 'train_red').setDepth(4);
-        obs.setVelocityY(scrollSpeed * 60);
-        obs.body.immovable = true;
-    }
-
-    function spawnCoin() {
-        if (isGameOver || !player) return;
-        const lane = Phaser.Math.Between(0, 2);
-        const coin = coins.create(lanes[lane], -40, 'coin_1').setDepth(4);
-        coin.setVelocityY(scrollSpeed * 60);
-    }
-
-    function collectCoin(p, coin) {
-        coin.destroy();
-        currentScore += 10;
-        scoreText.setText(`${playerName} | Map: ${selectedSubject} | Skor: ${currentScore}`);
-    }
-
-    function hitObstacle(p, obs) {
-        if (isGameOver) return;
-        isGameOver = true;
-        this.physics.pause();
-        obs.destroy();
-        triggerQuiz();
-    }
-
-    function update() {
-        if (!isGameOver && roadTile) {
-            roadTile.tilePositionY -= scrollSpeed;
-        }
-    }
-
-    Phaser.Scene.prototype.resumeAfterQuiz = function() {
-        isGameOver = false;
-        scoreText.setText(`${playerName} | Map: ${selectedSubject} | Skor: ${currentScore}`);
-        this.physics.resume();
+        scene: [PreloaderScene, MainScene]
     };
 </script>
 
