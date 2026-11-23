@@ -1,0 +1,322 @@
+{
+ "image": "spritesheet.png",
+ "width": 1024,
+ "height": 756,
+ "frames": {
+  "char_three_quarter": {
+   "x": 0,
+   "y": 0,
+   "w": 76,
+   "h": 200,
+   "category": "karakter"
+  },
+  "char_front": {
+   "x": 78,
+   "y": 0,
+   "w": 92,
+   "h": 194,
+   "category": "karakter"
+  },
+  "char_side": {
+   "x": 172,
+   "y": 0,
+   "w": 74,
+   "h": 193,
+   "category": "karakter"
+  },
+  "char_back": {
+   "x": 248,
+   "y": 0,
+   "w": 88,
+   "h": 192,
+   "category": "karakter"
+  },
+  "train_red": {
+   "x": 338,
+   "y": 0,
+   "w": 210,
+   "h": 183,
+   "category": "kendaraan"
+  },
+  "palm": {
+   "x": 550,
+   "y": 0,
+   "w": 144,
+   "h": 182,
+   "category": "lingkungan"
+  },
+  "train_yellow": {
+   "x": 696,
+   "y": 0,
+   "w": 181,
+   "h": 177,
+   "category": "kendaraan"
+  },
+  "tree_round": {
+   "x": 0,
+   "y": 202,
+   "w": 154,
+   "h": 176,
+   "category": "lingkungan"
+  },
+  "char_run_1": {
+   "x": 156,
+   "y": 202,
+   "w": 109,
+   "h": 167,
+   "category": "karakter"
+  },
+  "clock_tower": {
+   "x": 267,
+   "y": 202,
+   "w": 75,
+   "h": 161,
+   "category": "bangunan"
+  },
+  "building_yellow": {
+   "x": 344,
+   "y": 202,
+   "w": 101,
+   "h": 151,
+   "category": "bangunan"
+  },
+  "lamp_1": {
+   "x": 447,
+   "y": 202,
+   "w": 42,
+   "h": 150,
+   "category": "lingkungan"
+  },
+  "bus_shelter": {
+   "x": 491,
+   "y": 202,
+   "w": 249,
+   "h": 146,
+   "category": "lingkungan"
+  },
+  "tunnel": {
+   "x": 742,
+   "y": 202,
+   "w": 163,
+   "h": 143,
+   "category": "medan"
+  },
+  "building_blue": {
+   "x": 907,
+   "y": 202,
+   "w": 89,
+   "h": 142,
+   "category": "bangunan"
+  },
+  "building_pink": {
+   "x": 0,
+   "y": 380,
+   "w": 89,
+   "h": 142,
+   "category": "bangunan"
+  },
+  "billboard": {
+   "x": 91,
+   "y": 380,
+   "w": 122,
+   "h": 141,
+   "category": "lingkungan"
+  },
+  "lamp_2": {
+   "x": 215,
+   "y": 380,
+   "w": 36,
+   "h": 141,
+   "category": "lingkungan"
+  },
+  "signpost": {
+   "x": 253,
+   "y": 380,
+   "w": 68,
+   "h": 140,
+   "category": "lingkungan"
+  },
+  "char_head": {
+   "x": 323,
+   "y": 380,
+   "w": 115,
+   "h": 138,
+   "category": "karakter"
+  },
+  "rail_tile": {
+   "x": 440,
+   "y": 380,
+   "w": 178,
+   "h": 133,
+   "category": "medan"
+  },
+  "bush_flowers": {
+   "x": 620,
+   "y": 380,
+   "w": 140,
+   "h": 131,
+   "category": "lingkungan"
+  },
+  "shop": {
+   "x": 762,
+   "y": 380,
+   "w": 161,
+   "h": 128,
+   "category": "bangunan"
+  },
+  "char_run_2": {
+   "x": 0,
+   "y": 524,
+   "w": 111,
+   "h": 128,
+   "category": "karakter"
+  },
+  "platform_tile": {
+   "x": 113,
+   "y": 524,
+   "w": 146,
+   "h": 125,
+   "category": "medan"
+  },
+  "magnet": {
+   "x": 261,
+   "y": 524,
+   "w": 112,
+   "h": 122,
+   "category": "item"
+  },
+  "tree_small": {
+   "x": 375,
+   "y": 524,
+   "w": 81,
+   "h": 122,
+   "category": "lingkungan"
+  },
+  "sign_chevron": {
+   "x": 458,
+   "y": 524,
+   "w": 102,
+   "h": 109,
+   "category": "rintangan"
+  },
+  "road_tile": {
+   "x": 562,
+   "y": 524,
+   "w": 202,
+   "h": 107,
+   "category": "medan"
+  },
+  "cone": {
+   "x": 766,
+   "y": 524,
+   "w": 85,
+   "h": 103,
+   "category": "rintangan"
+  },
+  "barrier": {
+   "x": 853,
+   "y": 524,
+   "w": 128,
+   "h": 100,
+   "category": "rintangan"
+  },
+  "crate": {
+   "x": 0,
+   "y": 654,
+   "w": 100,
+   "h": 100,
+   "category": "rintangan"
+  },
+  "star": {
+   "x": 102,
+   "y": 654,
+   "w": 98,
+   "h": 100,
+   "category": "item"
+  },
+  "barrel": {
+   "x": 202,
+   "y": 654,
+   "w": 63,
+   "h": 99,
+   "category": "rintangan"
+  },
+  "coin_1": {
+   "x": 267,
+   "y": 654,
+   "w": 70,
+   "h": 87,
+   "category": "item"
+  },
+  "coin_2": {
+   "x": 339,
+   "y": 654,
+   "w": 69,
+   "h": 85,
+   "category": "item"
+  },
+  "coin_3": {
+   "x": 410,
+   "y": 654,
+   "w": 68,
+   "h": 85,
+   "category": "item"
+  },
+  "coin_4": {
+   "x": 480,
+   "y": 654,
+   "w": 66,
+   "h": 82,
+   "category": "item"
+  },
+  "ui_pause": {
+   "x": 548,
+   "y": 654,
+   "w": 78,
+   "h": 75,
+   "category": "ui"
+  },
+  "bench": {
+   "x": 628,
+   "y": 654,
+   "w": 106,
+   "h": 66,
+   "category": "lingkungan"
+  },
+  "ui_coin_icon": {
+   "x": 736,
+   "y": 654,
+   "w": 41,
+   "h": 43,
+   "category": "ui"
+  },
+  "ui_heart": {
+   "x": 779,
+   "y": 654,
+   "w": 49,
+   "h": 42,
+   "category": "ui"
+  },
+  "ui_trophy": {
+   "x": 830,
+   "y": 654,
+   "w": 46,
+   "h": 40,
+   "category": "ui"
+  }
+ },
+ "animations": {
+  "coin_spin": [
+   "coin_1",
+   "coin_2",
+   "coin_3",
+   "coin_4",
+   "coin_3",
+   "coin_2"
+  ],
+  "run": [
+   "char_run_1",
+   "char_run_2"
+  ]
+ }
+}

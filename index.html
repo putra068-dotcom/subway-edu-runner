@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu Runner - Graffiti Subway Edition</title>
+    <!-- Phaser 3 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Titan+One&display=swap');
+
+        * { box-sizing: border-box; user-select: none; }
+        body { margin: 0; padding: 0; background: #0a0a12; font-family: 'Titan One', cursive, sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        #game-container { 
+            width: 100vw; height: 56.25vw; max-width: 960px; max-height: 540px; 
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.3), 0 0 80px rgba(0,0,0,0.9); 
+            position: relative; border-radius: 16px; overflow: hidden; border: 4px solid #ffcc00;
+        }
+
+        .dom-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; justify-content: center; align-items: center; z-index: 10; }
+        
+        /* UI Menu Subway Surfers Style */
+        .menu-card { 
+            pointer-events: auto; background: rgba(15, 15, 25, 0.88); border: 4px solid #ff0055; 
+            padding: 20px 30px; border-radius: 24px; text-align: center; color: white; width: 85%; max-width: 460px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(255, 0, 85, 0.4); backdrop-filter: blur(8px);
+        }
+
+        .logo-title { 
+            font-family: 'Permanent Marker', cursive; font-size: 42px; color: #ffcc00; 
+            text-shadow: 4px 4px 0px #ff0055, 7px 7px 0px #000; margin: 0 0 10px 0; transform: rotate(-2deg); letter-spacing: 2px;
+        }
+
+        .sub-title { font-size: 14px; color: #00ffff; text-shadow: 2px 2px 0 #000; margin-bottom: 15px; letter-spacing: 1px; }
+
+        .input-name { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 3px solid #ffcc00; 
+            background: #1a1a2e; color: #fff; font-family: inherit; font-size: 16px; text-align: center; margin-bottom: 12px; outline: none;
+        }
+
+        .select-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .select-custom { 
+            flex: 1; padding: 10px; border-radius: 10px; border: 2px solid #00ffff; 
+            background: #0f172a; color: #fff; font-family: inherit; font-size: 13px; text-align: center; cursor: pointer;
+        }
+
+        .btn-subway { 
+            display: block; width: 100%; padding: 14px; margin: 8px 0; background: linear-gradient(180deg, #ff9900 0%, #ff5500 100%); 
+            color: white; border: 3px solid #fff; border-radius: 14px; font-size: 20px; font-family: 'Titan One', cursive; 
+            cursor: pointer; text-transform: uppercase; text-shadow: 2px 2px 0 #000; box-shadow: 0 6px 0 #993300, 0 10px 15px rgba(0,0,0,0.5); 
+            transition: all 0.1s ease;
+        }
+        .btn-subway:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-subway:active { transform: translateY(4px); box-shadow: 0 2px 0 #993300; }
+        .btn-blue { background: linear-gradient(180deg, #00ccff 0%, #0066ff 100%); box-shadow: 0 6px 0 #003399; }
+
+        /* Quiz Modal */
+        #quiz-container { 
+            display: none; pointer-events: auto; background: #ffffff; color: #1e293b; border: 5px solid #ff0055; 
+            border-radius: 24px; padding: 25px; width: 90%; max-width: 550px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center;
+        }
+        #question-text { font-size: 20px; margin-bottom: 20px; line-height: 1.4; color: #0f172a; }
+        .option-btn { 
+            display: block; width: 100%; padding: 12px 16px; margin: 8px 0; background: #f1f5f9; border: 3px solid #cbd5e1; 
+            border-radius: 12px; font-size: 16px; font-family: inherit; cursor: pointer; text-align: left; transition: all 0.2s;
+        }
+        .option-btn:hover { background: #e2e8f0; border-color: #ff0055; }
+        .option-btn.correct { background: #22c55e !important; color: white; border-color: #15803d; }
+        .option-btn.wrong { background: #ef4444 !important; color: white; border-color: #b91c1c; }
+
+        /* Admin Panel Modal */
+        #admin-panel { 
+            display: none; pointer-events: auto; background: #0f172a; color: white; padding: 25px; border-radius: 20px; 
+            width: 90%; max-width: 680px; max-height: 80vh; overflow-y: auto; text-align: left; border: 3px solid #00ffff;
+        }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 4px; font-size: 12px; color: #94a3b8; }
+        input[type="text"], textarea, select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-family: inherit; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #1e293b; }
+        th, td { border: 1px solid #334155; padding: 8px; font-size: 12px; text-align: left; }
+        th { background: #334155; color: #00ffff; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="dom-overlay">
+        <!-- Main Menu -->
+        <div id="main-menu" class="menu-card">
+            <h1 class="logo-title">SUBWAY EDU-RUNNER</h1>
+            <div class="sub-title">GRAFFITI EDITION • KELAS 2 SD</div>
+            
+            <input type="text" id="player-name" class="input-name" placeholder="Masukkan Nama Siswa..." value="Pemain 1">
+            
+            <div class="select-group">
+                <select id="select-class" class="select-custom">
+                    <option value="CLASS_2">Kelas 2 SD</option>
+                    <option value="CLASS_3">Kelas 3 SD</option>
+                </select>
+                <select id="select-subject" class="select-custom">
+                    <option value="MATEMATIKA">Matematika</option>
+                    <option value="BAHASA_INDONESIA">Bahasa Indonesia</option>
+                </select>
+            </div>
+
+            <button class="btn-subway" onclick="startGame()">MAIN SEKARANG</button>
+            <button class="btn-subway btn-blue" onclick="openAdminPanel()">PANEL GURU / ADMIN</button>
+        </div>
+
+        <!-- Quiz Overlay -->
+        <div id="quiz-container">
+            <div id="question-text">Memuat Soal...</div>
+            <div id="options-container"></div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel">
+            <h2 style="color: #ffcc00; margin-top: 0; border-bottom: 2px solid #334155; padding-bottom: 8px;">Panel Manajemen Soal Guru</h2>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <select id="admin-class" class="select-custom" onchange="loadQuestionsForAdmin()">
+                    <option value="CLASS_2">Kelas 2 SD</option>
+                    <option value="CLASS_3">Kelas 3 SD</option>
+                </select>
+                <select id="admin-subject" class="select-custom" onchange="loadQuestionsForAdmin()">
+                    <option value="MATEMATIKA">Matematika</option>
+                    <option value="BAHASA_INDONESIA">Bahasa Indonesia</option>
+                </select>
+            </div>
+
+            <div style="background: #1e293b; padding: 15px; border-radius: 12px;">
+                <h4 style="margin:0 0 10px 0; color:#00ffff;">Tambah Soal Baru</h4>
+                <div class="form-group"><label>Pertanyaan:</label><textarea id="q-text" rows="2"></textarea></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-group"><label>A:</label><input type="text" id="opt-a"></div>
+                    <div class="form-group"><label>B:</label><input type="text" id="opt-b"></div>
+                    <div class="form-group"><label>C:</label><input type="text" id="opt-c"></div>
+                    <div class="form-group"><label>D:</label><input type="text" id="opt-d"></div>
+                </div>
+                <div class="form-group">
+                    <label>Kunci Jawaban:</label>
+                    <select id="correct-ans">
+                        <option value="A">Pilihan A</option>
+                        <option value="B">Pilihan B</option>
+                        <option value="C">Pilihan C</option>
+                        <option value="D">Pilihan D</option>
+                    </select>
+                </div>
+                <button class="btn-subway" style="font-size:14px; padding:8px; margin-top:5px;" onclick="saveQuestion()">SIMPAN SOAL</button>
+            </div>
+
+            <h4 style="margin-top:15px;">Daftar Soal Tersimpan</h4>
+            <table>
+                <thead><tr><th>No</th><th>Pertanyaan</th><th>Kunci</th><th>Aksi</th></tr></thead>
+                <tbody id="question-table-body"></tbody>
+            </table>
+            <button class="btn-subway btn-blue" style="font-size:14px; padding:8px; margin-top:15px;" onclick="closeAdminPanel()">TUTUP PANEL</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const defaultQuestions = {
+        "CLASS_2": {
+            "MATEMATIKA": [
+                { id: 1, question: "Berapakah hasil penjumlahan dari 16 + 9?", options: ["23", "25", "27", "29"], answer: "B" },
+                { id: 2, question: "Bangun yang memiliki 4 sisi sama panjang adalah...", options: ["Segitiga", "Persegi", "Lingkaran", "Trapesium"], answer: "B" }
+            ],
+            "BAHASA_INDONESIA": [
+                { id: 1, question: "Hewan peliharaan yang mengeong adalah...", options: ["Kambing", "Kucing", "Anjing", "Ayam"], answer: "B" }
+            ]
+        }
+    };
+
+    if (!localStorage.getItem('edu_game_questions')) {
+        localStorage.setItem('edu_game_questions', JSON.stringify(defaultQuestions));
+    }
+
+    let activeQuestions = [], currentQuestionIndex = 0, gameInstance = null;
+    let playerName = "Siswa", currentScore = 0, selectedClass = "CLASS_2", selectedSubject = "MATEMATIKA";
+
+    function openAdminPanel() {
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        loadQuestionsForAdmin();
+    }
+
+    function closeAdminPanel() {
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('main-menu').style.display = 'block';
+    }
+
+    function getStoredData() { return JSON.parse(localStorage.getItem('edu_game_questions')) || {}; }
+    function saveStoredData(data) { localStorage.setItem('edu_game_questions', JSON.stringify(data)); }
+
+    function loadQuestionsForAdmin() {
+        const cls = document.getElementById('admin-class').value;
+        const subj = document.getElementById('admin-subject').value;
+        const data = getStoredData();
+        const questions = (data[cls] && data[cls][subj]) ? data[cls][subj] : [];
+        const tbody = document.getElementById('question-table-body');
+        tbody.innerHTML = '';
+        questions.forEach((q, idx) => {
+            tbody.innerHTML += `<tr><td>${idx+1}</td><td>${q.question}</td><td>${q.answer}</td><td><button onclick="deleteQuestion(${idx})" style="background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;">Hapus</button></td></tr>`;
+        });
+    }
+
+    function saveQuestion() {
+        const cls = document.getElementById('admin-class').value;
+        const subj = document.getElementById('admin-subject').value;
+        const qText = document.getElementById('q-text').value;
+        const optA = document.getElementById('opt-a').value;
+        const optB = document.getElementById('opt-b').value;
+        const optC = document.getElementById('opt-c').value;
+        const optD = document.getElementById('opt-d').value;
+        const ans = document.getElementById('correct-ans').value;
+
+        if (!qText || !optA || !optB || !optC || !optD) return alert('Lengkapi semua data!');
+        const data = getStoredData();
+        if (!data[cls]) data[cls] = {};
+        if (!data[cls][subj]) data[cls][subj] = [];
+        data[cls][subj].push({ id: Date.now(), question: qText, options: [optA, optB, optC, optD], answer: ans });
+        saveStoredData(data);
+        loadQuestionsForAdmin();
+        document.getElementById('q-text').value = '';
+        document.getElementById('opt-a').value = ''; document.getElementById('opt-b').value = '';
+        document.getElementById('opt-c').value = ''; document.getElementById('opt-d').value = '';
+    }
+
+    function deleteQuestion(idx) {
+        const cls = document.getElementById('admin-class').value;
+        const subj = document.getElementById('admin-subject').value;
+        const data = getStoredData();
+        data[cls][subj].splice(idx, 1);
+        saveStoredData(data);
+        loadQuestionsForAdmin();
+    }
+
+    function startGame() {
+        playerName = document.getElementById('player-name').value.trim() || "Siswa";
+        selectedClass = document.getElementById('select-class').value;
+        selectedSubject = document.getElementById('select-subject').value;
+        document.getElementById('main-menu').style.display = 'none';
+
+        if (!gameInstance) {
+            gameInstance = new Phaser.Game(config);
+        } else {
+            gameInstance.scene.getScene('MainScene').scene.restart();
+        }
+    }
+
+    function triggerQuiz() {
+        if (gameInstance) gameInstance.scene.pause('MainScene');
+        const data = getStoredData();
+        activeQuestions = (data[selectedClass] && data[selectedClass][selectedSubject]) ? data[selectedClass][selectedSubject] : defaultQuestions['CLASS_2']['MATEMATIKA'];
+        currentQuestionIndex = Phaser.Math.Between(0, activeQuestions.length - 1);
+        showQuestion();
+        document.getElementById('quiz-container').style.display = 'block';
+    }
+
+    function showQuestion() {
+        const q = activeQuestions[currentQuestionIndex];
+        document.getElementById('question-text').innerText = q.question;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        const labels = ['A', 'B', 'C', 'D'];
+        q.options.forEach((optText, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<strong>${labels[i]}.</strong> ${optText}`;
+            btn.onclick = () => checkAnswer(labels[i], btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn) {
+        const q = activeQuestions[currentQuestionIndex];
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        if (selected === q.answer) {
+            btn.classList.add('correct');
+            currentScore += 20;
+            setTimeout(() => finishQuiz(true), 1000);
+        } else {
+            btn.classList.add('wrong');
+            const labels = ['A', 'B', 'C', 'D'];
+            allBtns.forEach((b, i) => { if (labels[i] === q.answer) b.classList.add('correct'); });
+            setTimeout(() => finishQuiz(false), 1500);
+        }
+    }
+
+    function finishQuiz(correct) {
+        document.getElementById('quiz-container').style.display = 'none';
+        const scene = gameInstance.scene.getScene('MainScene');
+        if (correct) {
+            scene.resumeAfterQuiz();
+        } else {
+            alert(`Jawaban Salah! Game Over. Skor Akhir ${playerName}: ${currentScore}`);
+            location.reload();
+        }
+    }
+
+    // Phaser 3 Engine dengan Auto Procedural Graphics Fallback (Anti Layar Hitam)
+    const config = {
+        type: Phaser.AUTO,
+        parent: 'game-container',
+        width: 960,
+        height: 540,
+        physics: { default: 'arcade', arcade: { gravity: { y: 1600 }, debug: false } },
+        scene: { key: 'MainScene', preload: preload, create: create, update: update }
+    };
+
+    let player, lanes = [280, 480, 680], currentLaneIndex = 1;
+    let obstacles, coins, scoreText, roadTile;
+    let isJumping = false, isGameOver = false, scrollSpeed = 6;
+
+    function preload() {
+        // Pembuatan Grafik Vektor Bawaan (Anti Hitam bila Aset PNG Belum Terbaca)
+        let g = this.make.graphics({ x: 0, y: 0, add: false });
+        
+        // Player (Baju Grafiti Merah-Kuning)
+        g.fillStyle(0xff0055, 1); g.fillRect(10, 0, 30, 40);
+        g.fillStyle(0x00ffff, 1); g.fillRect(10, 40, 30, 30);
+        g.fillStyle(0xffcc00, 1); g.fillCircle(25, -5, 12);
+        g.generateTexture('char_back', 50, 80);
+
+        // Kereta / Rintangan
+        g.clear(); g.fillStyle(0xd97706, 1); g.fillRect(0, 0, 70, 50);
+        g.fillStyle(0xff0055, 1); g.fillRect(5, 10, 60, 15);
+        g.generateTexture('train_red', 70, 50);
+
+        // Koin Emas
+        g.clear(); g.fillStyle(0xfacc15, 1); g.fillCircle(15, 15, 15);
+        g.generateTexture('coin_1', 30, 30);
+
+        // Rel Jalan
+        g.clear(); g.fillStyle(0x1e293b, 1); g.fillRect(0, 0, 400, 100);
+        g.fillStyle(0x475569, 1); g.fillRect(40, 0, 10, 100); g.fillRect(350, 0, 10, 100);
+        g.generateTexture('rail_tile', 400, 100);
+
+        // Mencoba membaca aset eksternal secara aman jika ada
+        this.load.json('assets_manifest', 'assets.json');
+    }
+
+    function create() {
+        isGameOver = false; currentScore = 0;
+        
+        // Background Kota
+        this.add.rectangle(0, 0, 960, 540, 0x0f172a).setOrigin(0);
+        this.add.rectangle(480, 120, 960, 120, 0x1e293b).setOrigin(0.5);
+
+        // Rel 3-Jalur
+        roadTile = this.add.tileSprite(480, 380, 500, 540, 'rail_tile');
+
+        // Character Player
+        player = this.physics.add.sprite(lanes[currentLaneIndex], 430, 'char_back').setDepth(5);
+        player.setCollideWorldBounds(true);
+        player.body.setSize(40, 70);
+
+        obstacles = this.physics.add.group();
+        coins = this.physics.add.group();
+
+        scoreText = this.add.text(20, 20, `${playerName} | Map: ${selectedSubject} | Skor: 0`, {
+            fontSize: '18px', fill: '#ffcc00', fontStyle: 'bold',
+            backgroundColor: '#0f172aaa', padding: { x: 12, y: 6 }
+        }).setDepth(10);
+
+        // Input Keyboard
+        this.input.keyboard.on('keydown-LEFT', () => moveLane(-1));
+        this.input.keyboard.on('keydown-RIGHT', () => moveLane(1));
+        this.input.keyboard.on('keydown-UP', () => jumpPlayer());
+
+        this.time.addEvent({ delay: 1700, callback: spawnObstacle, callbackScope: this, loop: true });
+        this.time.addEvent({ delay: 850, callback: spawnCoin, callbackScope: this, loop: true });
+
+        this.physics.add.overlap(player, coins, collectCoin, null, this);
+        this.physics.add.collider(player, obstacles, hitObstacle, null, this);
+    }
+
+    function moveLane(dir) {
+        if (isGameOver || isJumping) return;
+        currentLaneIndex = Phaser.Math.Clamp(currentLaneIndex + dir, 0, 2);
+        player.x = lanes[currentLaneIndex];
+    }
+
+    function jumpPlayer() {
+        if (!isJumping && player.body.touching.down) {
+            isJumping = true;
+            player.setVelocityY(-850);
+            this.time.delayedCall(750, () => { isJumping = false; });
+        }
+    }
+
+    function spawnObstacle() {
+        if (isGameOver || !player) return;
+        const lane = Phaser.Math.Between(0, 2);
+        const obs = obstacles.create(lanes[lane], -50, 'train_red').setDepth(4);
+        obs.setVelocityY(scrollSpeed * 60);
+        obs.body.immovable = true;
+    }
+
+    function spawnCoin() {
+        if (isGameOver || !player) return;
+        const lane = Phaser.Math.Between(0, 2);
+        const coin = coins.create(lanes[lane], -40, 'coin_1').setDepth(4);
+        coin.setVelocityY(scrollSpeed * 60);
+    }
+
+    function collectCoin(p, coin) {
+        coin.destroy();
+        currentScore += 10;
+        scoreText.setText(`${playerName} | Map: ${selectedSubject} | Skor: ${currentScore}`);
+    }
+
+    function hitObstacle(p, obs) {
+        if (isGameOver) return;
+        isGameOver = true;
+        this.physics.pause();
+        obs.destroy();
+        triggerQuiz();
+    }
+
+    function update() {
+        if (!isGameOver && roadTile) {
+            roadTile.tilePositionY -= scrollSpeed;
+        }
+    }
+
+    Phaser.Scene.prototype.resumeAfterQuiz = function() {
+        isGameOver = false;
+        scoreText.setText(`${playerName} | Map: ${selectedSubject} | Skor: ${currentScore}`);
+        this.physics.resume();
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,369 @@
+{
+ "total": 43,
+ "assets": [
+  {
+   "name": "building_blue",
+   "category": "bangunan",
+   "file": "bangunan/building_blue.png",
+   "width": 89,
+   "height": 142,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "building_pink",
+   "category": "bangunan",
+   "file": "bangunan/building_pink.png",
+   "width": 89,
+   "height": 142,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "building_yellow",
+   "category": "bangunan",
+   "file": "bangunan/building_yellow.png",
+   "width": 101,
+   "height": 151,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "clock_tower",
+   "category": "bangunan",
+   "file": "bangunan/clock_tower.png",
+   "width": 75,
+   "height": 161,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "shop",
+   "category": "bangunan",
+   "file": "bangunan/shop.png",
+   "width": 161,
+   "height": 128,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "coin_1",
+   "category": "item",
+   "file": "item/coin_1.png",
+   "width": 70,
+   "height": 87,
+   "anchor": "center",
+   "usage": "frame 1 animasi koin berputar"
+  },
+  {
+   "name": "coin_2",
+   "category": "item",
+   "file": "item/coin_2.png",
+   "width": 69,
+   "height": 85,
+   "anchor": "center",
+   "usage": "frame 2"
+  },
+  {
+   "name": "coin_3",
+   "category": "item",
+   "file": "item/coin_3.png",
+   "width": 68,
+   "height": 85,
+   "anchor": "center",
+   "usage": "frame 3"
+  },
+  {
+   "name": "coin_4",
+   "category": "item",
+   "file": "item/coin_4.png",
+   "width": 66,
+   "height": 82,
+   "anchor": "center",
+   "usage": "frame 4"
+  },
+  {
+   "name": "magnet",
+   "category": "item",
+   "file": "item/magnet.png",
+   "width": 112,
+   "height": 122,
+   "anchor": "center",
+   "usage": "power-up penarik koin"
+  },
+  {
+   "name": "star",
+   "category": "item",
+   "file": "item/star.png",
+   "width": 98,
+   "height": 100,
+   "anchor": "center",
+   "usage": "power-up bonus / kebal"
+  },
+  {
+   "name": "char_back",
+   "category": "karakter",
+   "file": "karakter/char_back.png",
+   "width": 88,
+   "height": 192,
+   "anchor": "bottom-center",
+   "usage": "sprite utama saat berlari ke depan (kamera di belakang)"
+  },
+  {
+   "name": "char_front",
+   "category": "karakter",
+   "file": "karakter/char_front.png",
+   "width": 92,
+   "height": 194,
+   "anchor": "bottom-center",
+   "usage": "layar pilih karakter / menu"
+  },
+  {
+   "name": "char_head",
+   "category": "karakter",
+   "file": "karakter/char_head.png",
+   "width": 115,
+   "height": 138,
+   "anchor": "center",
+   "usage": "avatar profil / ikon nyawa"
+  },
+  {
+   "name": "char_run_1",
+   "category": "karakter",
+   "file": "karakter/char_run_1.png",
+   "width": 109,
+   "height": 167,
+   "anchor": "bottom-center",
+   "usage": "frame lari 1"
+  },
+  {
+   "name": "char_run_2",
+   "category": "karakter",
+   "file": "karakter/char_run_2.png",
+   "width": 111,
+   "height": 128,
+   "anchor": "bottom-center",
+   "usage": "frame lari 2 / meluncur"
+  },
+  {
+   "name": "char_side",
+   "category": "karakter",
+   "file": "karakter/char_side.png",
+   "width": 74,
+   "height": 193,
+   "anchor": "bottom-center",
+   "usage": "tampak samping, animasi idle"
+  },
+  {
+   "name": "char_three_quarter",
+   "category": "karakter",
+   "file": "karakter/char_three_quarter.png",
+   "width": 76,
+   "height": 200,
+   "anchor": "bottom-center",
+   "usage": "animasi pindah jalur"
+  },
+  {
+   "name": "train_red",
+   "category": "kendaraan",
+   "file": "kendaraan/train_red.png",
+   "width": 210,
+   "height": 183,
+   "anchor": "bottom-center",
+   "usage": "kereta lawan arah, rintangan besar (hindari jalur)"
+  },
+  {
+   "name": "train_yellow",
+   "category": "kendaraan",
+   "file": "kendaraan/train_yellow.png",
+   "width": 181,
+   "height": 177,
+   "anchor": "bottom-center",
+   "usage": "kereta lawan arah varian kedua"
+  },
+  {
+   "name": "bench",
+   "category": "lingkungan",
+   "file": "lingkungan/bench.png",
+   "width": 106,
+   "height": 66,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "billboard",
+   "category": "lingkungan",
+   "file": "lingkungan/billboard.png",
+   "width": 122,
+   "height": 141,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "bus_shelter",
+   "category": "lingkungan",
+   "file": "lingkungan/bus_shelter.png",
+   "width": 249,
+   "height": 146,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "bush_flowers",
+   "category": "lingkungan",
+   "file": "lingkungan/bush_flowers.png",
+   "width": 140,
+   "height": 131,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "lamp_1",
+   "category": "lingkungan",
+   "file": "lingkungan/lamp_1.png",
+   "width": 42,
+   "height": 150,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "lamp_2",
+   "category": "lingkungan",
+   "file": "lingkungan/lamp_2.png",
+   "width": 36,
+   "height": 141,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "palm",
+   "category": "lingkungan",
+   "file": "lingkungan/palm.png",
+   "width": 144,
+   "height": 182,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "signpost",
+   "category": "lingkungan",
+   "file": "lingkungan/signpost.png",
+   "width": 68,
+   "height": 140,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "tree_round",
+   "category": "lingkungan",
+   "file": "lingkungan/tree_round.png",
+   "width": 154,
+   "height": 176,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "tree_small",
+   "category": "lingkungan",
+   "file": "lingkungan/tree_small.png",
+   "width": 81,
+   "height": 122,
+   "anchor": "bottom-center"
+  },
+  {
+   "name": "platform_tile",
+   "category": "medan",
+   "file": "medan/platform_tile.png",
+   "width": 146,
+   "height": 125,
+   "anchor": "center"
+  },
+  {
+   "name": "rail_tile",
+   "category": "medan",
+   "file": "medan/rail_tile.png",
+   "width": 178,
+   "height": 133,
+   "anchor": "center"
+  },
+  {
+   "name": "road_tile",
+   "category": "medan",
+   "file": "medan/road_tile.png",
+   "width": 202,
+   "height": 107,
+   "anchor": "center"
+  },
+  {
+   "name": "tunnel",
+   "category": "medan",
+   "file": "medan/tunnel.png",
+   "width": 163,
+   "height": 143,
+   "anchor": "center"
+  },
+  {
+   "name": "barrel",
+   "category": "rintangan",
+   "file": "rintangan/barrel.png",
+   "width": 63,
+   "height": 99,
+   "anchor": "bottom-center",
+   "usage": "rintangan blok"
+  },
+  {
+   "name": "barrier",
+   "category": "rintangan",
+   "file": "rintangan/barrier.png",
+   "width": 128,
+   "height": 100,
+   "anchor": "bottom-center",
+   "usage": "rintangan rendah, bisa dilompati"
+  },
+  {
+   "name": "cone",
+   "category": "rintangan",
+   "file": "rintangan/cone.png",
+   "width": 85,
+   "height": 103,
+   "anchor": "bottom-center",
+   "usage": "rintangan rendah kecil"
+  },
+  {
+   "name": "crate",
+   "category": "rintangan",
+   "file": "rintangan/crate.png",
+   "width": 100,
+   "height": 100,
+   "anchor": "bottom-center",
+   "usage": "rintangan blok"
+  },
+  {
+   "name": "sign_chevron",
+   "category": "rintangan",
+   "file": "rintangan/sign_chevron.png",
+   "width": 102,
+   "height": 109,
+   "anchor": "bottom-center",
+   "usage": "rambu belok, rintangan tinggi"
+  },
+  {
+   "name": "ui_coin_icon",
+   "category": "ui",
+   "file": "ui/ui_coin_icon.png",
+   "width": 41,
+   "height": 43,
+   "anchor": "center"
+  },
+  {
+   "name": "ui_heart",
+   "category": "ui",
+   "file": "ui/ui_heart.png",
+   "width": 49,
+   "height": 42,
+   "anchor": "center"
+  },
+  {
+   "name": "ui_pause",
+   "category": "ui",
+   "file": "ui/ui_pause.png",
+   "width": 78,
+   "height": 75,
+   "anchor": "center"
+  },
+  {
+   "name": "ui_trophy",
+   "category": "ui",
+   "file": "ui/ui_trophy.png",
+   "width": 46,
+   "height": 40,
+   "anchor": "center"
+  }
+ ]
+}
