@@ -301,7 +301,7 @@
         }
     }
 
-    // SCENE 1: PRELOADER (Direct Dynamic File Paths from repository assets)
+    // SCENE 1: PRELOADER
     class PreloaderScene extends Phaser.Scene {
         constructor() { super('PreloaderScene'); }
 
@@ -319,13 +319,8 @@
                 progressBar.fillRect(290, 260, 380 * val, 20);
             });
 
-            // Pemuatan Berkas Aset Langsung Sesuai Struktur Folder Repositori
-            // Karakter
+            // Karakter & Rintangan
             this.load.image('char_back', 'assets/sprites/karakter/char_back.png');
-            this.load.image('char_run_1', 'assets/sprites/karakter/char_run_1.png');
-            this.load.image('char_run_2', 'assets/sprites/karakter/char_run_2.png');
-            
-            // Kendaraan & Rintangan
             this.load.image('train_red', 'assets/sprites/kendaraan/train_red.png');
             this.load.image('train_yellow', 'assets/sprites/kendaraan/train_yellow.png');
             this.load.image('barrier', 'assets/sprites/rintangan/barrier.png');
@@ -339,19 +334,14 @@
             this.load.image('coin_2', 'assets/sprites/item/coin_2.png');
             this.load.image('coin_3', 'assets/sprites/item/coin_3.png');
             this.load.image('coin_4', 'assets/sprites/item/coin_4.png');
-            this.load.image('magnet', 'assets/sprites/item/magnet.png');
-            this.load.image('star', 'assets/sprites/item/star.png');
 
             // Lingkungan & Medan
             this.load.image('rail_tile', 'assets/sprites/medan/rail_tile.png');
             this.load.image('building_blue', 'assets/sprites/bangunan/building_blue.png');
-            this.load.image('building_pink', 'assets/sprites/bangunan/building_pink.png');
             this.load.image('building_yellow', 'assets/sprites/bangunan/building_yellow.png');
             this.load.image('clock_tower', 'assets/sprites/bangunan/clock_tower.png');
-            this.load.image('tree_round', 'assets/sprites/lingkungan/tree_round.png');
             this.load.image('palm', 'assets/sprites/lingkungan/palm.png');
             this.load.image('bench', 'assets/sprites/lingkungan/bench.png');
-            this.load.image('bus_shelter', 'assets/sprites/lingkungan/bus_shelter.png');
 
             // UI
             this.load.image('ui_coin_icon', 'assets/sprites/ui/ui_coin_icon.png');
@@ -371,7 +361,7 @@
             currentScore = 0;
             currentLaneIndex = 1;
 
-            // Animasi Koin Berputar (coin_1 s.d. coin_4)
+            // Animasi Koin Berputar
             if (this.textures.exists('coin_1')) {
                 this.anims.create({
                     key: 'coin_spin',
@@ -380,32 +370,29 @@
                 });
             }
 
-            // 1. Sky & Background Buildings (Perspektif Subway Surfers)
+            // 1. Sky & Background Buildings (Disusun Pas di Latar Belakang)
             this.add.rectangle(0, 0, 960, 540, 0x0f172a).setOrigin(0);
             
-            // Bangunan Latar
-            if (this.textures.exists('building_blue')) this.add.image(120, 150, 'building_blue').setDepth(1).setScale(1.3);
-            if (this.textures.exists('clock_tower')) this.add.image(480, 140, 'clock_tower').setDepth(1).setScale(1.2);
-            if (this.textures.exists('building_yellow')) this.add.image(840, 150, 'building_yellow').setDepth(1).setScale(1.3);
+            if (this.textures.exists('building_blue')) this.add.image(130, 140, 'building_blue').setDepth(1).setScale(1.1);
+            if (this.textures.exists('clock_tower')) this.add.image(480, 130, 'clock_tower').setDepth(1).setScale(1.0);
+            if (this.textures.exists('building_yellow')) this.add.image(830, 140, 'building_yellow').setDepth(1).setScale(1.1);
+            if (this.textures.exists('palm')) this.add.image(60, 240, 'palm').setDepth(2).setScale(0.9);
+            if (this.textures.exists('bench')) this.add.image(900, 250, 'bench').setDepth(2).setScale(0.8);
 
-            // Pepohonan & Halte Samping Rel
-            if (this.textures.exists('palm')) this.add.image(60, 280, 'palm').setDepth(2).setScale(1.1);
-            if (this.textures.exists('bus_shelter')) this.add.image(900, 300, 'bus_shelter').setDepth(2).setScale(0.9);
+            // 2. Pembuatan 3 Jalur Rel Lurus (Menyambungkan Segmen `rail_tile` Secara Vertikal)
+            railGroup = this.add.group();
+            this.createRailTracks();
 
-            // 2. Rel 3-Jalur (Scrolling TileSprite)
-            roadTile = this.add.tileSprite(480, 380, 520, 540, 'rail_tile').setDepth(3);
-
-            // 3. Karakter Player (Pemain Lari dari Belakang)
-            const playerKey = this.textures.exists('char_back') ? 'char_back' : 'char_run_1';
-            player = this.physics.add.sprite(lanes[currentLaneIndex], 430, playerKey).setDepth(6);
-            player.setScale(0.7);
+            // 3. Karakter Player (Pemain Berlari dari Belakang)
+            player = this.physics.add.sprite(lanes[currentLaneIndex], 440, 'char_back').setDepth(6);
+            player.setScale(0.65);
             player.setCollideWorldBounds(true);
             player.body.setSize(55, 95);
 
             obstacles = this.physics.add.group();
             coins = this.physics.add.group();
 
-            // 4. UI Top Bar
+            // 4. Top UI Header
             if (this.textures.exists('ui_coin_icon')) {
                 this.add.image(35, 30, 'ui_coin_icon').setDepth(10).setScale(0.85);
             }
@@ -414,17 +401,29 @@
                 backgroundColor: '#0f172aaa', padding: { x: 12, y: 6 }
             }).setDepth(10);
 
-            // Kontrol Input Panah Keyboard
+            // Controls
             this.input.keyboard.on('keydown-LEFT', () => this.moveLane(-1));
             this.input.keyboard.on('keydown-RIGHT', () => this.moveLane(1));
             this.input.keyboard.on('keydown-UP', () => this.jumpPlayer());
 
-            // Spawner Objek
+            // Spawners
             this.time.addEvent({ delay: 1700, callback: this.spawnObstacle, callbackScope: this, loop: true });
-            this.time.addEvent({ delay: 800, callback: this.spawnCoin, callbackScope: this, loop: true });
+            this.time.addEvent({ delay: 850, callback: this.spawnCoin, callbackScope: this, loop: true });
 
             this.physics.add.overlap(player, coins, this.collectCoin, null, this);
             this.physics.add.collider(player, obstacles, this.hitObstacle, null, this);
+        }
+
+        createRailTracks() {
+            // Membuat segmen rel menyambung ke bawah di 3 jalur (Lanes: 300, 480, 660)
+            const lanePos = [300, 480, 660];
+            for (let laneX of lanePos) {
+                for (let y = -100; y <= 650; y += 110) {
+                    let tile = this.add.image(laneX, y, 'rail_tile').setDepth(3);
+                    tile.setScale(0.7);
+                    railGroup.add(tile);
+                }
+            }
         }
 
         moveLane(dir) {
@@ -453,9 +452,9 @@
             obs.body.immovable = true;
 
             if (chosenType.includes('train')) {
-                obs.setScale(0.75);
+                obs.setScale(0.7);
             } else {
-                obs.setScale(0.85);
+                obs.setScale(0.8);
             }
         }
 
@@ -467,7 +466,7 @@
             if (this.anims.exists('coin_spin')) coin.play('coin_spin');
             
             coin.setVelocityY(scrollSpeed * 60);
-            coin.setScale(0.65);
+            coin.setScale(0.6);
         }
 
         collectCoin(p, coin) {
@@ -485,8 +484,14 @@
         }
 
         update() {
-            if (!isGameOver && roadTile) {
-                roadTile.tilePositionY -= scrollSpeed;
+            if (!isGameOver && railGroup) {
+                // Menggulung segmen rel ke bawah secara mulus
+                railGroup.getChildren().forEach(tile => {
+                    tile.y += scrollSpeed;
+                    if (tile.y > 600) {
+                        tile.y = -100;
+                    }
+                });
             }
         }
 
@@ -497,9 +502,9 @@
         }
     }
 
-    const lanes = [280, 480, 680];
-    let currentLaneIndex = 1, player, obstacles, coins, scoreText, roadTile;
-    let isJumping = false, isGameOver = false, scrollSpeed = 6.5;
+    const lanes = [300, 480, 660];
+    let currentLaneIndex = 1, player, obstacles, coins, scoreText, railGroup;
+    let isJumping = false, isGameOver = false, scrollSpeed = 6;
 
     const config = {
         type: Phaser.AUTO,
